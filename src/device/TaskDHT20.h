@@ -3,7 +3,7 @@
 
 #include "globals.h"
 
-extern void initDHT20();
-extern void getValueDHT20(); 
-extern void TaskTemperatureHumidity(void *pvParameters);
+extern void TaskTemp(void *pvParameters);
+extern void TaskBlinkLED(void *pvParameters);
+
 #endif /* INC_TASKDHT20_H_ */
