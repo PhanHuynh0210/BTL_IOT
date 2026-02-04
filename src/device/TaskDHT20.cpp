@@ -25,6 +25,14 @@ void TaskDHT20(void *pvParameters)
         if (dht20.read() == DHT20_OK)
         {
             data.temp = dht20.getTemperature();
+            data.humi = dht20.getHumidity();
+
+            Serial.print("DHT20 OK: ");
+            Serial.print(data.temp);
+            Serial.print("C ");
+            Serial.print(data.humi);
+            Serial.println("%");
+
             if (data.temp < 30){
                 xSemaphoreGive(tempLowSem);
             }

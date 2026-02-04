@@ -1,7 +1,7 @@
 #include "TaskWifi.h"
 
-constexpr char WIFI_SSID[] = "ACLAB";
-constexpr char WIFI_PASSWORD[] = "ACLAB2023";
+constexpr char WIFI_SSID[] = "HOANG HUYNH VNPT";
+constexpr char WIFI_PASSWORD[] = "0917683220";
 
 void InitWiFi()
 {

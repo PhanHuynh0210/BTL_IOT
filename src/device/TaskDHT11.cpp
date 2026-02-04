@@ -1,53 +1,43 @@
 #include "TaskDHT11.h"
 
-#define DHT11_PIN 21
-#define DHT11_LED_PIN 48
+#define DHT11_PIN 10   
 
-DHT11 dht11(DHT11_PIN);
+DHTesp dht;
 
 void TaskDHT11(void *pvParameters)
 {
     Sensordata data;
-    
-    tempLowSem  = xSemaphoreCreateBinary();
-    tempMidSem  = xSemaphoreCreateBinary();
-    tempHighSem = xSemaphoreCreateBinary();
-
-    humLowSem  = xSemaphoreCreateBinary();
-    humMidSem  = xSemaphoreCreateBinary();
-    humHighSem = xSemaphoreCreateBinary();
-
-    lcdQueue = xQueueCreate(1, sizeof(Sensordata));
+    dht.setup(DHT11_PIN, DHTesp::DHT11);
 
     while (true)
     {
+        TempAndHumidity values = dht.getTempAndHumidity();
 
-        if (dht11.readTemperatureHumidity(data.temp, data.humi))
+        if (dht.getStatus() == DHTesp::ERROR_NONE)
         {
+            data.temp = values.temperature;
+            data.humi = values.humidity;
 
-            // Task 1
-            if (data.temp < 30){
+            Serial.print("DHT11 OK: ");
+            Serial.print(data.temp);
+            Serial.print(" C | ");
+            Serial.print(data.humi);
+            Serial.println(" %");
+
+            if (data.temp < 30)
                 xSemaphoreGive(tempLowSem);
-            }
-            else if (data.temp < 35){
+            else if (data.temp < 35)
                 xSemaphoreGive(tempMidSem);
-            }
-            else{
+            else
                 xSemaphoreGive(tempHighSem);
-            }
 
-            // task2
-            if (data.humi < 30){
+            if (data.humi < 30)
                 xSemaphoreGive(humLowSem);
-            }
-            else if (data.humi < 35){
+            else if (data.humi < 35)
                 xSemaphoreGive(humMidSem);
-            }
-            else{
+            else
                 xSemaphoreGive(humHighSem);
-            }
 
-            // Task 3
             xQueueOverwrite(lcdQueue, &data);
         }
 

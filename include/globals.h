@@ -9,8 +9,9 @@
 #include <DHT20.h>
 #include <PubSubClient.h>
 #include <Arduino.h>
-#include <DHT11.h>
 #include <LiquidCrystal_I2C.h>
+#include <Adafruit_NeoPixel.h>
+#include "DHTesp.h"
 
 ///
 #include "../src/connect/TaskWifi.h"

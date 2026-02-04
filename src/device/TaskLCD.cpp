@@ -1,13 +1,13 @@
 #include "TaskLCD.h"
-
-LiquidCrystal_I2C lcd(33, 16, 2);
-int adcPins[] = {1, 2, 3, 4};
+#define MY_SCL 11
+#define MY_SDA 12
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 void TaskLCD(void *paParameters){
 
     Sensordata data;
-
-    lcd.init(MY_SDA, MY_SCL);
+    Wire.begin(MY_SDA, MY_SCL);
+    lcd.init();
 	lcd.backlight();
 
     while (true) {
