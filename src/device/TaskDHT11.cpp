@@ -24,7 +24,7 @@ void TaskDHT11(void *pvParameters)
             Serial.print(data.humi);
             Serial.println(" %");
 
-            if (data.temp < 30)
+            if (data.temp < 20)
                 xSemaphoreGive(tempLowSem);
             else if (data.temp < 35)
                 xSemaphoreGive(tempMidSem);

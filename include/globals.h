@@ -21,6 +21,7 @@
 #include "../src/device/TaskNeoPixel.h"
 #include "../src/device/TaskBlink.h"
 #include "../src/device/TaskLCD.h"
+#include "../src/connect/TaskCOREIOT.h"
 
 
 extern SemaphoreHandle_t tempLowSem;
