@@ -11,3 +11,4 @@ SemaphoreHandle_t humHighSem = nullptr;
 SemaphoreHandle_t CoreIOTSem = xSemaphoreCreateBinary();
 
 QueueHandle_t lcdQueue = nullptr;
+QueueHandle_t coreIOTQueue = nullptr;

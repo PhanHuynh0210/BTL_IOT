@@ -12,10 +12,11 @@
 #include <LiquidCrystal_I2C.h>
 #include <Adafruit_NeoPixel.h>
 #include "DHTesp.h"
+#include <ArduinoJson.h>
+
 
 ///
 #include "../src/connect/TaskWifi.h"
-#include "../src/connect/TaskMQTT.h"
 #include "../src/device/TaskDHT20.h"
 #include "../src/device/TaskDHT11.h"
 #include "../src/device/TaskNeoPixel.h"
@@ -35,6 +36,8 @@ extern SemaphoreHandle_t humHighSem;
 extern SemaphoreHandle_t CoreIOTSem;
 
 extern QueueHandle_t lcdQueue;
+extern QueueHandle_t coreIOTQueue;
+
 
 
 typedef struct{

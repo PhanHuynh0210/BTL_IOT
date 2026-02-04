@@ -39,6 +39,7 @@ void TaskDHT11(void *pvParameters)
                 xSemaphoreGive(humHighSem);
 
             xQueueOverwrite(lcdQueue, &data);
+            xQueueOverwrite(coreIOTQueue, &data);
         }
 
         vTaskDelay(pdMS_TO_TICKS(3000));
