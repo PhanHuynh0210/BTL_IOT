@@ -1,74 +1,54 @@
 #include "TaskDHT11.h"
 
-#include <DHT11.h>
-
 #define DHT11_PIN 21
 #define DHT11_LED_PIN 48
 
-QueueHandle_t delayQueueDHT11;
-
 DHT11 dht11(DHT11_PIN);
-
-void TaskBlinkLED11(void *pvParameters){
-    TickType_t delayTime = pdMS_TO_TICKS(1000);
-
-    while (true){
-        xQueueReceive(delayQueueDHT11, &delayTime, 0);
-        digitalWrite(DHT11_LED_PIN, !digitalRead(DHT11_LED_PIN));
-        vTaskDelay(delayTime);
-    }
-    
-    
-}
 
 void TaskDHT11(void *pvParameters)
 {
-    (void)pvParameters;
-    pinMode(DHT11_LED_PIN, OUTPUT);
+    Sensordata data;
+    
+    tempLowSem  = xSemaphoreCreateBinary();
+    tempMidSem  = xSemaphoreCreateBinary();
+    tempHighSem = xSemaphoreCreateBinary();
 
-    delayQueueDHT11 = xQueueCreate(1, sizeof(TickType_t));
+    humLowSem  = xSemaphoreCreateBinary();
+    humMidSem  = xSemaphoreCreateBinary();
+    humHighSem = xSemaphoreCreateBinary();
 
-    xTaskCreate(TaskBlinkLED11, "TaskBlinkLED11", 4096, NULL, 1, NULL);
+    lcdQueue = xQueueCreate(1, sizeof(Sensordata));
 
     while (true)
     {
-        int temperature = 0;
-        int humidity = 0;
-        int result = dht11.readTemperatureHumidity(temperature, humidity);
 
-        if (result == 0)
+        if (dht11.readTemperatureHumidity(data.temp, data.humi))
         {
-            TickType_t delayValue;
 
-            if (temperature < 30)
-            {
-                delayValue = pdMS_TO_TICKS(100);
+            // Task 1
+            if (data.temp < 30){
+                xSemaphoreGive(tempLowSem);
             }
-            else if (temperature < 35)
-            {
-                delayValue = pdMS_TO_TICKS(1000);
+            else if (data.temp < 35){
+                xSemaphoreGive(tempMidSem);
             }
-            else
-            {
-                delayValue = pdMS_TO_TICKS(200);
+            else{
+                xSemaphoreGive(tempHighSem);
             }
 
-            xQueueOverwrite(delayQueueDHT11, &delayValue);
+            // task2
+            if (data.humi < 30){
+                xSemaphoreGive(humLowSem);
+            }
+            else if (data.humi < 35){
+                xSemaphoreGive(humMidSem);
+            }
+            else{
+                xSemaphoreGive(humHighSem);
+            }
 
-            uint8_t level;
-            if (humidity < 40)
-            {
-                level = 0;
-            }
-            else if (humidity < 60)
-            {
-                level = 1;
-            }
-            else
-            {
-                level = 2;
-            }
-            NeoPixelSetHumidityLevel(level);
+            // Task 3
+            xQueueOverwrite(lcdQueue, &data);
         }
 
         vTaskDelay(pdMS_TO_TICKS(3000));

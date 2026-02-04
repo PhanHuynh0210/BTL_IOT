@@ -3,7 +3,6 @@
 
 #include "globals.h"
 
-extern void TaskTemp(void *pvParameters);
-extern void TaskBlinkLED(void *pvParameters);
+extern void TaskDHT20(void *pvParameters);
 
 #endif /* INC_TASKDHT20_H_ */
