@@ -19,10 +19,6 @@ void TaskBlink(void *pvParameters){
         else if (xSemaphoreTake(tempHighSem, 0)){
             vTaskDelay(pdMS_TO_TICKS(200));
        }
-       else {
-            vTaskDelay(pdMS_TO_TICKS(500)); 
-        }
-
        digitalWrite(DHT11_LED_PIN,!digitalRead(DHT11_LED_PIN));
     }
 
