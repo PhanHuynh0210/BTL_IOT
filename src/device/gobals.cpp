@@ -8,4 +8,6 @@ SemaphoreHandle_t humLowSem  = nullptr;
 SemaphoreHandle_t humMidSem  = nullptr;
 SemaphoreHandle_t humHighSem = nullptr;
 
+SemaphoreHandle_t CoreIOTSem = xSemaphoreCreateBinary();
+
 QueueHandle_t lcdQueue = nullptr;

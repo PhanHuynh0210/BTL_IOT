@@ -16,8 +16,8 @@ void setup()
 
   lcdQueue = xQueueCreate(1, sizeof(Sensordata));
 
+  xTaskCreate(TaskWiFi,   "TaskWiFi",    4096, NULL, 4, 0);
 
-  // InitWiFi();
 
   xTaskCreate(TaskDHT11,   "TaskDHT11",    4096, NULL, 3, NULL);
   // xTaskCreate(TaskDHT20,   "DHT20",    4096, NULL, 3, NULL);

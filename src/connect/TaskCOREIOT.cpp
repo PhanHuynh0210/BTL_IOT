@@ -75,18 +75,9 @@
 
 
 // void setup_coreiot(){
-
-//   //Serial.print("Connecting to WiFi...");
-//   //WiFi.begin(wifi_ssid, wifi_password);
-//   //while (WiFi.status() != WL_CONNECTED) {
-  
-//   // while (isWifiConnected == false) {
-//   //   delay(500);
-//   //   Serial.print(".");
-//   // }
-
+    
 //   while(1){
-//     if (xSemaphoreTake(xBinarySemaphoreInternet, portMAX_DELAY)) {
+//     if (xSemaphoreTake(CoreIOTSem, portMAX_DELAY)) {
 //       break;
 //     }
 //     delay(500);
@@ -112,7 +103,6 @@
 //         }
 //         client.loop();
 
-//         // Sample payload, publish to 'v1/devices/me/telemetry'
 //         String payload = "{\"temperature\":" + String(glob_temperature) +  ",\"humidity\":" + String(glob_humidity) + "}";
         
 //         client.publish("v1/devices/me/telemetry", payload.c_str());

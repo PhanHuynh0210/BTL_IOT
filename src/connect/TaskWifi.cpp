@@ -1,27 +1,36 @@
 #include "TaskWifi.h"
 
-constexpr char WIFI_SSID[] = "HOANG HUYNH VNPT";
+constexpr char WIFI_SSID[]     = "HOANG HUYNH VNPT";
 constexpr char WIFI_PASSWORD[] = "0917683220";
 
 void InitWiFi()
 {
-    Serial.println("Connecting to AP ...");
+    Serial.println("[WiFi] Connecting...");
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        delay(500);
+
+    uint8_t retry = 0;
+    
+    while (WiFi.status() != WL_CONNECTED && retry < 20){
+        vTaskDelay(pdMS_TO_TICKS(500));
         Serial.print(".");
+        retry++;
     }
-    Serial.println("Connected to AP");
+
+    if (WiFi.status() == WL_CONNECTED){
+        Serial.println("\n[WiFi] Connected");
+        xSemaphoreGive(CoreIOTSem);  
+    }
+    
+
 }
 
-bool Wifi_reconnect()
+
+void TaskWiFi(void *pvParameters)
 {
-    const wl_status_t status = WiFi.status();
-    if (status == WL_CONNECTED)
-    {
-        return true;
+    for (;;){
+        if (WiFi.status() != WL_CONNECTED){
+            InitWiFi();
+        }
+        vTaskDelay(pdMS_TO_TICKS(5000));
     }
-    InitWiFi();
-    return true;
 }

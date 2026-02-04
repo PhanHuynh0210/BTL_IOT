@@ -32,6 +32,8 @@ extern SemaphoreHandle_t humLowSem;
 extern SemaphoreHandle_t humMidSem;
 extern SemaphoreHandle_t humHighSem;
 
+extern SemaphoreHandle_t CoreIOTSem;
+
 extern QueueHandle_t lcdQueue;
 
 
