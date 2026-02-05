@@ -15,6 +15,7 @@
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <WiFiClientSecure.h>
+#include <Preferences.h> 
 
 ///
 #include "../src/connect/TaskWifi.h"
@@ -44,6 +45,9 @@ extern SemaphoreHandle_t otaSem;
 
 extern QueueHandle_t lcdQueue;
 extern QueueHandle_t coreIOTQueue;
+
+extern QueueHandle_t mqttUpdateSem;
+
 
 
 extern PubSubClient client;

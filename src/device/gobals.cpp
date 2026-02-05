@@ -15,5 +15,7 @@ SemaphoreHandle_t otaSem = nullptr;
 QueueHandle_t lcdQueue = nullptr;
 QueueHandle_t coreIOTQueue = nullptr;
 
+QueueHandle_t mqttUpdateSem = nullptr;
+
 WiFiClient espClient;
 PubSubClient client(espClient);

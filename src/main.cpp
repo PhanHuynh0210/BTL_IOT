@@ -16,6 +16,8 @@ void setup()
 
   otaSem = xSemaphoreCreateBinary();
 
+  mqttUpdateSem = xSemaphoreCreateBinary();
+
   lcdQueue = xQueueCreate(1, sizeof(Sensordata));
   coreIOTQueue = xQueueCreate(1, sizeof(Sensordata));
 
