@@ -3,5 +3,5 @@
 
 #include "globals.h"
 
-
+extern void ota_task(void *pvParameters);
 #endif // TASKOTA_H
