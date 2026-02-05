@@ -14,6 +14,7 @@ bool mqttReconnect()
     {
         Serial.println("OK");
         client.subscribe("v1/devices/me/rpc/request/+");
+        client.subscribe("v1/devices/me/attributes");
         return true;
     }
 
@@ -38,10 +39,21 @@ void callback(char* topic, byte* payload, unsigned int length) {
     return;
   }
 
-    const char* method = doc["method"];
-    if (strcmp(method, "checkFirmware") == 0) {
-        xSemaphoreGive(otaSem);   
+if (doc.containsKey("method")) {
+        const char* method = doc["method"];
+
+        if (strcmp(method, "checkFirmware") == 0) {
+            xSemaphoreGive(otaSem);
+            return;
+        }
     }
+
+    if (doc.containsKey("updatemqtt")) {
+        const char* token = doc["updatemqtt"];
+        Serial.print("[ATTR] new token: ");
+        Serial.println(token);
+    }
+
 }
 
 
