@@ -4,12 +4,6 @@ const char* coreIOT_Server = "app.coreiot.io";
 const char* coreIOT_Token = "gtf8cv81mqtv4zv799mj";   
 const int   mqttPort = 1883;
 
-WiFiClient espClient;
-PubSubClient client(espClient);
-
-
-
-
 bool mqttReconnect()
 {
     if (client.connected())
@@ -28,8 +22,6 @@ bool mqttReconnect()
     return false;
 }
 
-
-
 void callback(char* topic, byte* payload, unsigned int length) {
 
   char message[length + 1];
@@ -46,24 +38,13 @@ void callback(char* topic, byte* payload, unsigned int length) {
     return;
   }
 
-  const char* method = doc["method"];
-  if (strcmp(method, "setStateLED") == 0) {
-    const char* params = doc["params"];
-
-    if (strcmp(params, "ON") == 0) {
-      Serial.println("Device turned ON.");
-      //TODO
-
-    } else {   
-      Serial.println("Device turned OFF.");
-      //TODO
-
+    const char* method = doc["method"];
+    if (strcmp(method, "checkFirmware") == 0) {
+        xSemaphoreGive(otaSem);   
     }
-  } else {
-    Serial.print("Unknown method: ");
-    Serial.println(method);
-  }
 }
+
+
 
 void setup_coreiot()
 {

@@ -13,7 +13,8 @@
 #include <Adafruit_NeoPixel.h>
 #include "DHTesp.h"
 #include <ArduinoJson.h>
-
+#include <HTTPClient.h>
+#include <WiFiClientSecure.h>
 
 ///
 #include "../src/connect/TaskWifi.h"
@@ -23,6 +24,9 @@
 #include "../src/device/TaskBlink.h"
 #include "../src/device/TaskLCD.h"
 #include "../src/connect/TaskCOREIOT.h"
+#include "../src/device/TaskOTA.h"
+
+
 
 
 extern SemaphoreHandle_t tempLowSem;
@@ -35,9 +39,14 @@ extern SemaphoreHandle_t humHighSem;
 
 extern SemaphoreHandle_t CoreIOTSem;
 
+extern SemaphoreHandle_t otaSem;
+
+
 extern QueueHandle_t lcdQueue;
 extern QueueHandle_t coreIOTQueue;
 
+
+extern PubSubClient client;
 
 
 typedef struct{

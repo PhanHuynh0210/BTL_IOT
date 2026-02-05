@@ -14,6 +14,8 @@ void setup()
   humMidSem  = xSemaphoreCreateBinary();
   humHighSem = xSemaphoreCreateBinary();
 
+  otaSem = xSemaphoreCreateBinary();
+
   lcdQueue = xQueueCreate(1, sizeof(Sensordata));
   coreIOTQueue = xQueueCreate(1, sizeof(Sensordata));
 
@@ -21,6 +23,7 @@ void setup()
   xTaskCreate(TaskWiFi,   "TaskWiFi",    4096, NULL, 5, 0);
   xTaskCreate(coreiot_task,   "coreiot_task",    4096, NULL, 4, 0);
 
+  xTaskCreate(ota_task,   "ota_task",    8192, NULL, 3, 0);
 
   xTaskCreate(TaskDHT11,   "TaskDHT11",    4096, NULL, 3, NULL);
   // xTaskCreate(TaskDHT20,   "DHT20",    4096, NULL, 3, NULL);

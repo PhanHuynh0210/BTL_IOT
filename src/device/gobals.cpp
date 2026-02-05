@@ -10,5 +10,10 @@ SemaphoreHandle_t humHighSem = nullptr;
 
 SemaphoreHandle_t CoreIOTSem = xSemaphoreCreateBinary();
 
+SemaphoreHandle_t otaSem = nullptr;
+
 QueueHandle_t lcdQueue = nullptr;
 QueueHandle_t coreIOTQueue = nullptr;
+
+WiFiClient espClient;
+PubSubClient client(espClient);
