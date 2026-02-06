@@ -48,6 +48,10 @@ void taskStateManager(void *pvParameters) {
           if (evt == EVT_WIFI_SAVED) {   
             current = STATUS_CONNECTING;
             setStatus(current);
+            stopAP();
+            
+            system_event evt = EVT_WIFI_START;
+            xQueueSend(wifiQueue, &evt, 0);
           }
           break;
 

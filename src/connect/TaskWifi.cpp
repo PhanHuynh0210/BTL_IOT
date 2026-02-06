@@ -1,11 +1,10 @@
 #include "TaskWifi.h"
 
-constexpr char WIFI_SSID[]     = "HOANG HUYNH VNPT";
-constexpr char WIFI_PASSWORD[] = "0917683220";
 
 void TaskWiFi(void *pvParameters)
 {
     system_event evt;
+    String ssid, pass;
 
     for (;;)
     {
@@ -13,8 +12,16 @@ void TaskWiFi(void *pvParameters)
         {
             if (evt == EVT_WIFI_START)
             {
-                Serial.println("[WiFi] Connecting...");
-                WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+                loadWiFi(ssid, pass);
+
+                if (ssid.length() == 0) {
+                    system_event fail = EVT_WIFI_FAIL;
+                    xQueueSend(stateQueue, &fail, 0);
+                    continue;
+                }
+
+                WiFi.mode(WIFI_STA);
+                WiFi.begin(ssid.c_str(), pass.c_str());
 
                 uint8_t retry = 0;
                 while (WiFi.status() != WL_CONNECTED && retry < 20)
@@ -26,11 +33,13 @@ void TaskWiFi(void *pvParameters)
                 if (WiFi.status() == WL_CONNECTED)
                 {
                     Serial.println("[WiFi] Connected");
+                    Serial.print("[WiFi] IP: ");
+                    Serial.println(WiFi.localIP());
 
                     system_event ok = EVT_WIFI_OK;
                     xQueueSend(stateQueue, &ok, 0);
-                    xSemaphoreGive(CoreIOTSem);
 
+                    xSemaphoreGive(CoreIOTSem);
                 }
                 else
                 {
