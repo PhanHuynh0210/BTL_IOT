@@ -25,7 +25,11 @@
 #include "../src/device/TaskBlink.h"
 #include "../src/device/TaskLCD.h"
 #include "../src/connect/TaskCOREIOT.h"
+#include "../src/connect/ApMode.h"
 #include "../src/device/TaskOTA.h"
+#include "../src/system/StatusESP.h"
+#include "../src/system/LedStatus.h"
+
 
 
 
@@ -46,9 +50,16 @@ extern SemaphoreHandle_t otaSem;
 extern QueueHandle_t lcdQueue;
 extern QueueHandle_t coreIOTQueue;
 
-extern QueueHandle_t mqttUpdateSem;
+extern SemaphoreHandle_t mqttUpdateSem;
+
+extern QueueHandle_t stateQueue;
+extern QueueHandle_t ledQueue;
+
+extern QueueHandle_t wifiQueue;
 
 
+extern TimerHandle_t bootTimeoutTimer;
+ 
 
 extern PubSubClient client;
 
@@ -57,6 +68,31 @@ typedef struct{
     int temp;
     int humi;
 } Sensordata;
+
+typedef enum {
+  STATUS_BOOTING,
+  STATUS_AP_MODE,
+  STATUS_CONNECTING,
+  STATUS_NORMAL,
+  STATUS_ERROR,
+  STATUS_OTA_UPDATE
+} system_status;
+
+typedef enum {
+  EVT_WIFI_START,
+  EVT_WIFI_OK,
+  EVT_WIFI_FAIL,
+
+  
+  EVT_WIFI_SAVED,
+  EVT_BOOT_TIMEOUT,
+  EVT_BOOT_BUTTON_LONG,
+  EVT_MQTT_OK,
+  EVT_MQTT_FAIL,
+  EVT_OTA_START,
+  EVT_OTA_DONE
+} system_event;
+
 
 #define MY_SCL 11
 #define MY_SDA 12

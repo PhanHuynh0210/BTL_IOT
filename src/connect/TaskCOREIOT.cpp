@@ -86,11 +86,7 @@ if (doc.containsKey("method")) {
 
 void setup_coreiot()
 {
-    Serial.println("[CoreIOT] Waiting for WiFi...");
     xSemaphoreTake(CoreIOTSem, portMAX_DELAY);
-
-    Serial.println("[CoreIOT] WiFi ready!");
-
     client.setServer(coreIOT_Server, mqttPort);
     client.setCallback(callback);
 }

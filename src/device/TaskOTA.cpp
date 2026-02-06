@@ -80,8 +80,6 @@ void checkFirmwareVersion()
 
 void ota_task(void *pvParameters)
 {
-    Serial.println("[OTA] OTA task started");
-
     for (;;)
     {
         if (xSemaphoreTake(otaSem, portMAX_DELAY))
