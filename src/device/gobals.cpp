@@ -12,7 +12,7 @@ SemaphoreHandle_t humHighSem = nullptr;
 SemaphoreHandle_t CoreIOTSem = xSemaphoreCreateBinary();
 
 //check ota version
-SemaphoreHandle_t otaSem = nullptr;
+QueueHandle_t otaQueue = nullptr;
 
 // data
 QueueHandle_t lcdQueue = nullptr;
@@ -20,8 +20,6 @@ QueueHandle_t coreIOTQueue = nullptr;
 
 //update mqtt
 SemaphoreHandle_t mqttUpdateSem = nullptr;
-
-
 //status sys
 QueueHandle_t stateQueue;
 QueueHandle_t ledQueue;

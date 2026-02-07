@@ -80,12 +80,27 @@ void checkFirmwareVersion()
 
 void ota_task(void *pvParameters)
 {
+    OTA_SYS ota;
     for (;;)
     {
-        if (xSemaphoreTake(otaSem, portMAX_DELAY))
+        if (xQueueReceive(otaQueue,&ota, portMAX_DELAY))
         {
-            Serial.println("[OTA] Semaphore received");
-            checkFirmwareVersion();  
+            switch (ota)
+            {
+            case OTA_CHECK:
+                Serial.println("[OTA] Semaphore received");
+                checkFirmwareVersion();
+                break;
+
+            case OTA_UPDATE:
+                Serial.println("[OTA] Semaphore received");
+                updateFirmwareVersion();
+                break;
+            
+            default:
+                break;
+            }
+             
         }
     }
 }

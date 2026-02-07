@@ -14,7 +14,7 @@ void setup()
   humMidSem  = xSemaphoreCreateBinary();
   humHighSem = xSemaphoreCreateBinary();
 
-  otaSem = xSemaphoreCreateBinary();
+  otaQueue = xQueueCreate(2, sizeof(OTA_SYS));
 
   mqttUpdateSem = xSemaphoreCreateBinary();
 

@@ -30,8 +30,6 @@ void taskStateManager(void *pvParameters) {
             current = STATUS_AP_MODE;
             xTimerStop(bootTimeoutTimer, 0);
             setStatus(current);
-                            Serial.println("vao ap");
-
             initAP();
           }
           else if (evt == EVT_BOOT_TIMEOUT) {
@@ -49,7 +47,7 @@ void taskStateManager(void *pvParameters) {
             current = STATUS_CONNECTING;
             setStatus(current);
             stopAP();
-            
+
             system_event evt = EVT_WIFI_START;
             xQueueSend(wifiQueue, &evt, 0);
           }
@@ -58,6 +56,7 @@ void taskStateManager(void *pvParameters) {
         case STATUS_CONNECTING:
           if (evt == EVT_WIFI_OK){
             current = STATUS_NORMAL;
+            xSemaphoreGive(CoreIOTSem);
             setStatus(current);
           }
 

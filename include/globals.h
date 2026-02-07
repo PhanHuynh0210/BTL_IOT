@@ -44,7 +44,7 @@ extern SemaphoreHandle_t humHighSem;
 
 extern SemaphoreHandle_t CoreIOTSem;
 
-extern SemaphoreHandle_t otaSem;
+extern QueueHandle_t otaQueue;
 
 
 extern QueueHandle_t lcdQueue;
@@ -77,6 +77,11 @@ typedef enum {
   STATUS_ERROR,
   STATUS_OTA_UPDATE
 } system_status;
+
+typedef enum {
+  OTA_CHECK,
+  OTA_UPDATE
+} OTA_SYS;
 
 typedef enum {
   EVT_WIFI_START,

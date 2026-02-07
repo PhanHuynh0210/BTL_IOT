@@ -51,6 +51,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
   memcpy(message, payload, length);
   message[length] = '\0';
 
+  OTA_SYS ota;
+
   // Parse JSON
   StaticJsonDocument<256> doc;
   DeserializationError error = deserializeJson(doc, message);
@@ -61,11 +63,17 @@ void callback(char* topic, byte* payload, unsigned int length) {
     return;
   }
 
-if (doc.containsKey("method")) {
+    if (doc.containsKey("method")) {
         const char* method = doc["method"];
 
         if (strcmp(method, "checkFirmware") == 0) {
-            xSemaphoreGive(otaSem);
+            ota = OTA_CHECK;
+            xQueueSend(otaQueue, &ota, 0);
+            return;
+        }
+        if (strcmp(method, "updateFirmware") == 0) {
+            ota = OTA_UPDATE;
+            xQueueSend(otaQueue, &ota, 0);
             return;
         }
     }
