@@ -16,6 +16,8 @@
 #include <HTTPClient.h>
 #include <WiFiClientSecure.h>
 #include <Preferences.h> 
+#include "HTTPUpdate.h"
+
 
 ///
 #include "../src/connect/TaskWifi.h"

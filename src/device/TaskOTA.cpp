@@ -1,6 +1,71 @@
 #include "TaskOTA.h"
 
-#define CURRENT_FW_VERSION "v1.0.0"
+
+String VersionNew;
+
+#define OTA_BASE_URL "https://raw.githubusercontent.com/PhanHuynh0210/TTNT/gh-pages"
+#define OTA_BIN_NAME "firmware.bin"
+
+void updateFirmwareVersion()
+{
+    if (VersionNew.length() == 0)
+    {
+        Serial.println("[OTA] No new version available");
+        return;
+    }
+
+    if (WiFi.status() != WL_CONNECTED)
+    {
+        Serial.println("[OTA] WiFi not connected");
+        return;
+    }
+
+    String firmwareUrl =
+        String(OTA_BASE_URL) + "/" + VersionNew + "/" OTA_BIN_NAME;
+
+    Serial.println("=== OTA UPDATE START ===");
+    Serial.println("Version: " + VersionNew);
+    Serial.println("URL: " + firmwareUrl);
+    Serial.println("========================");
+
+    WiFiClientSecure otaClient;
+    otaClient.setInsecure();
+
+    httpUpdate.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+
+    system_event evt = EVT_OTA_START;
+    xQueueSend(stateQueue, &evt, 0);
+    client.publish("esp32/status/wifi", "ota_update");
+    delay(100);
+
+    httpUpdate.onProgress([](int cur, int total) {
+        if (total <= 0) return;
+        int percent = (cur * 100) / total;
+        Serial.printf("[OTA] %d%%\n", percent);
+    });
+
+    t_httpUpdate_return ret = httpUpdate.update(otaClient, firmwareUrl);
+
+    // switch (ret)
+    // {
+    //     case HTTP_UPDATE_FAILED:
+    //         Serial.printf("[OTA] Failed: %s\n",
+    //             httpUpdate.getLastErrorString().c_str());
+    //         setStatus(STATUS_ERROR);
+    //         break;
+
+    //     case HTTP_UPDATE_NO_UPDATES:
+    //         Serial.println("[OTA] No update");
+    //         setStatus(STATUS_NORMAL);
+    //         break;
+
+    //     case HTTP_UPDATE_OK:
+    //         Serial.println("[OTA] Update success – rebooting");
+    //         break;
+    // }
+}
+
+
 
 void checkFirmwareVersion()
 {
@@ -56,18 +121,16 @@ void checkFirmwareVersion()
     }
 
     const char* latestVersion = doc["tag_name"];
+    VersionNew = latestVersion;
     if (latestVersion == nullptr)
     {
         Serial.println("[OTA] tag_name not found");
         return;
     }
 
-    bool needUpdate = strcmp(latestVersion, CURRENT_FW_VERSION) != 0;
 
     StaticJsonDocument<256> mgs;
-    mgs["firmware_current"] = CURRENT_FW_VERSION;
     mgs["firmware_latest"]  = latestVersion;
-    mgs["need_update"]      = needUpdate;
 
     char buffer[256];
     serializeJson(mgs, buffer);
@@ -94,7 +157,7 @@ void ota_task(void *pvParameters)
 
             case OTA_UPDATE:
                 Serial.println("[OTA] Semaphore received");
-                // updateFirmwareVersion();
+                updateFirmwareVersion();
                 break;
             
             default:
