@@ -95,7 +95,7 @@ void stopAP(void) {
     apRunning = false;
 }
 
-static void handleAPClient(WiFiClient &client) {
+void handleAPClient(WiFiClient &client) {
   String req = "";
   unsigned long timeout = millis() + 1000;
   while (client.connected() && millis() < timeout) {

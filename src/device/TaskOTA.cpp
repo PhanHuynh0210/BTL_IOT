@@ -94,7 +94,7 @@ void ota_task(void *pvParameters)
 
             case OTA_UPDATE:
                 Serial.println("[OTA] Semaphore received");
-                updateFirmwareVersion();
+                // updateFirmwareVersion();
                 break;
             
             default:

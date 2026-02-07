@@ -137,7 +137,7 @@ void coreiot_task(void *pvParameters){
         }
         client.loop(); 
 
-        if(xQueueReceive(coreIOTQueue, &data, portMAX_DELAY)){
+        if(xQueueReceive(coreIOTQueue, &data, pdMS_TO_TICKS(1000))){
             if (WiFi.status() != WL_CONNECTED){
                 xSemaphoreTake(CoreIOTSem, portMAX_DELAY);
             }
