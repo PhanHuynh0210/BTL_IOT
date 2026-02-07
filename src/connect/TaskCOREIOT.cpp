@@ -148,9 +148,11 @@ void coreiot_task(void *pvParameters){
             doc["humidity"]    = data.humi;
 
             char buffer[128];
-            serializeJson(doc, buffer);
+            size_t len = serializeJson(doc, buffer);
 
-            client.publish("v1/devices/me/telemetry", buffer);
+            client.publish("v1/devices/me/telemetry",buffer,len);
+
+
 
             Serial.print("[CoreIOT] Published: ");
             Serial.println(buffer);
