@@ -40,6 +40,8 @@ void TaskDHT11(void *pvParameters)
 
             xQueueOverwrite(lcdQueue, &data);
             xQueueOverwrite(coreIOTQueue, &data);
+            xQueueOverwrite(MLTinyQueue, &data);
+
         }
 
         vTaskDelay(pdMS_TO_TICKS(3000));

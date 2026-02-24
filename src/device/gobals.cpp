@@ -17,6 +17,7 @@ QueueHandle_t otaQueue = nullptr;
 // data
 QueueHandle_t lcdQueue = nullptr;
 QueueHandle_t coreIOTQueue = nullptr;
+QueueHandle_t MLTinyQueue = nullptr;
 
 //update mqtt
 SemaphoreHandle_t mqttUpdateSem = nullptr;

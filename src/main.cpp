@@ -21,6 +21,8 @@ void setup()
   //data
   lcdQueue = xQueueCreate(1, sizeof(Sensordata));
   coreIOTQueue = xQueueCreate(1, sizeof(Sensordata));
+  MLTinyQueue = xQueueCreate(1, sizeof(Sensordata));
+
 
   stateQueue = xQueueCreate(10, sizeof(system_event));
   ledQueue = xQueueCreate(5, sizeof(system_status));
@@ -49,6 +51,7 @@ void setup()
   // xTaskCreate(TaskBlink,"TaskBlink", 4096, NULL, 2, NULL);
   // xTaskCreate(TaskNeoPixel,"NeoPixel", 4096, NULL, 2, NULL);
   xTaskCreate(TaskLCD,     "LCD",      4096, NULL, 1, NULL);
+  xTaskCreatePinnedToCore(TaskTinyML,"TinyML Task",10000,NULL,1, NULL,1);
 
 }
 

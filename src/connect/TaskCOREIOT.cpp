@@ -154,8 +154,8 @@ void coreiot_task(void *pvParameters){
 
 
 
-            Serial.print("[CoreIOT] Published: ");
-            Serial.println(buffer);
+            // Serial.print("[CoreIOT] Published: ");
+            // Serial.println(buffer);
             
         }
     }

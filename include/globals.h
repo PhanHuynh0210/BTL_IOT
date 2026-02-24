@@ -17,7 +17,7 @@
 #include <WiFiClientSecure.h>
 #include <Preferences.h> 
 #include "HTTPUpdate.h"
-
+#include <TensorFlowLite_ESP32.h>
 
 ///
 #include "../src/connect/TaskWifi.h"
@@ -31,9 +31,13 @@
 #include "../src/device/TaskOTA.h"
 #include "../src/system/StatusESP.h"
 #include "../src/system/LedStatus.h"
+#include "../src/device/TaskML.h"
 
 
-
+#include "tensorflow/lite/schema/schema_generated.h"
+#include "tensorflow/lite/micro/micro_interpreter.h"
+#include "tensorflow/lite/micro/micro_error_reporter.h"
+#include "tensorflow/lite/micro/all_ops_resolver.h"
 
 
 extern SemaphoreHandle_t tempLowSem;
@@ -51,6 +55,8 @@ extern QueueHandle_t otaQueue;
 
 extern QueueHandle_t lcdQueue;
 extern QueueHandle_t coreIOTQueue;
+extern QueueHandle_t MLTinyQueue;
+
 
 extern SemaphoreHandle_t mqttUpdateSem;
 
