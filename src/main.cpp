@@ -51,7 +51,7 @@ void setup()
   // xTaskCreate(TaskBlink,"TaskBlink", 4096, NULL, 2, NULL);
   // xTaskCreate(TaskNeoPixel,"NeoPixel", 4096, NULL, 2, NULL);
   xTaskCreate(TaskLCD,     "LCD",      4096, NULL, 1, NULL);
-  xTaskCreatePinnedToCore(TaskTinyML,"TinyML Task",10000,NULL,1, NULL,1);
+  // xTaskCreatePinnedToCore(TaskTinyML,"TinyML Task",10000,NULL,1, NULL,1);
 
 }
 
