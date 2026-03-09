@@ -1,9 +1,11 @@
 #include "globals.h"
 
+// Status singleled
 SemaphoreHandle_t tempLowSem  = nullptr;
 SemaphoreHandle_t tempMidSem  = nullptr;
 SemaphoreHandle_t tempHighSem = nullptr;
 
+// Status neo
 SemaphoreHandle_t humLowSem  = nullptr;
 SemaphoreHandle_t humMidSem  = nullptr;
 SemaphoreHandle_t humHighSem = nullptr;
@@ -24,9 +26,9 @@ SemaphoreHandle_t mqttUpdateSem = nullptr;
 //status sys
 QueueHandle_t stateQueue;
 QueueHandle_t ledQueue;
-
+// status wifi
 QueueHandle_t wifiQueue;
 
-
+// wifi init
 WiFiClient espClient;
 PubSubClient client(espClient);

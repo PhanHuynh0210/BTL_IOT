@@ -104,8 +104,16 @@ void coreiot_task(void *pvParameters){
     loadMqttToken();
 
     Sensordata data;
+    bool checkwifi = false;
 
     while(true){
+        bool wifiConnected = (WiFi.status() == WL_CONNECTED);
+
+        if (checkwifi && !wifiConnected) {
+            system_event evt = EVT_WIFI_FAIL;
+            xQueueSend(stateQueue, &evt, 0);
+        }
+        checkwifi = wifiConnected;
 
         if (xSemaphoreTake(mqttUpdateSem, 0) == pdTRUE) {
             Serial.println("[MQTT] Token updated, reconnecting...");
@@ -114,7 +122,7 @@ void coreiot_task(void *pvParameters){
             vTaskDelay(pdMS_TO_TICKS(300)); 
         }
 
-        if (WiFi.status() != WL_CONNECTED) {
+        if (!wifiConnected) {
             xSemaphoreTake(CoreIOTSem, portMAX_DELAY);
         }
 

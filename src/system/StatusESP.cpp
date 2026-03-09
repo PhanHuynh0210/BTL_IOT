@@ -71,6 +71,13 @@ void taskStateManager(void *pvParameters) {
             current = STATUS_OTA_UPDATE;
             setStatus(current);
           }
+          if (evt == EVT_WIFI_FAIL) {
+            current = STATUS_CONNECTING;
+            setStatus(current);
+
+            system_event evt = EVT_WIFI_START;
+            xQueueSend(wifiQueue, &evt, 0);
+          }
           break;
 
         case STATUS_ERROR:
