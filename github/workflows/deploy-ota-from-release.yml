@@ -1,0 +1,50 @@
+name: Deploy OTA firmware to GitHub Pages
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        
+      - name: Wait for release to finish processing
+        run: |
+          echo "Waiting 20 seconds for release assets to be ready..."
+          sleep 20
+
+      - name: Download firmware.bin from release
+        uses: robinraju/release-downloader@v1.8
+        with:
+          tag: ${{ github.ref_name }}
+          fileName: firmware.bin
+          out-file-path: ./firmware/
+
+      - name: Checkout gh-pages branch with write permission
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Copy firmware to gh-pages
+        run: |
+          VERSION=${{ github.ref_name }}
+          mkdir -p gh-pages/${VERSION}
+          cp firmware/firmware.bin gh-pages/${VERSION}/firmware.bin
+
+      - name: Configure Git identity
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Commit and push to gh-pages
+        run: |
+          cd gh-pages
+          git add .
+          git commit -m "Add firmware for version ${{ github.ref_name }}" || echo "No changes to commit"
+          git push origin gh-pages
