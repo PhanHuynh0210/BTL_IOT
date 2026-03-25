@@ -1,6 +1,6 @@
 #include "TaskDHT20.h"
 
-#define LED_PIN 48
+// #define LED_PIN 48
 
 
 DHT20 dht20;
@@ -9,14 +9,16 @@ DHT20 dht20;
 void TaskDHT20(void *pvParameters)
 {
    Sensordata data;
-    
-    tempLowSem  = xSemaphoreCreateBinary();
-    tempMidSem  = xSemaphoreCreateBinary();
-    tempHighSem = xSemaphoreCreateBinary();
+        Wire.begin(MY_SDA, MY_SCL);
+        dht20.begin();  
 
-    humLowSem  = xSemaphoreCreateBinary();
-    humMidSem  = xSemaphoreCreateBinary();
-    humHighSem = xSemaphoreCreateBinary();
+    // tempLowSem  = xSemaphoreCreateBinary();
+    // tempMidSem  = xSemaphoreCreateBinary();
+    // tempHighSem = xSemaphoreCreateBinary();
+
+    // humLowSem  = xSemaphoreCreateBinary();
+    // humMidSem  = xSemaphoreCreateBinary();
+    // humHighSem = xSemaphoreCreateBinary();
 
     lcdQueue = xQueueCreate(1, sizeof(Sensordata));
 
@@ -56,6 +58,8 @@ void TaskDHT20(void *pvParameters)
 
             // Task 3
             xQueueOverwrite(lcdQueue, &data);
+            xQueueOverwrite(coreIOTQueue, &data);
+            xQueueOverwrite(MLTinyQueue, &data);
         }
 
         vTaskDelay(pdMS_TO_TICKS(3000)); 

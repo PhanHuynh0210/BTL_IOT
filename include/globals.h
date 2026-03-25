@@ -107,8 +107,8 @@ typedef enum {
 } system_event;
 
 
-#define MY_SCL 11
-#define MY_SDA 12
+#define MY_SCL 12
+#define MY_SDA 11
 
 
 #endif
