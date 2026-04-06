@@ -22,6 +22,7 @@ void setup()
   lcdQueue = xQueueCreate(1, sizeof(Sensordata));
   coreIOTQueue = xQueueCreate(1, sizeof(Sensordata));
   MLTinyQueue = xQueueCreate(1, sizeof(Sensordata));
+  GGSheetQueue = xQueueCreate(1, sizeof(Sensordata));
 
 
   stateQueue = xQueueCreate(10, sizeof(system_event));
@@ -46,8 +47,10 @@ void setup()
 
   xTaskCreate(ota_task,   "ota_task",    8192, NULL, 3, 0);
 
-  // xTaskCreate(TaskDHT11,   "TaskDHT11",    4096, NULL, 3, NULL);
-  xTaskCreate(TaskDHT20,   "DHT20",    4096, NULL, 3, NULL);
+  xTaskCreate(TaskDHT11,   "TaskDHT11",    4096, NULL, 3, NULL);
+  xTaskCreate(TaskGGsheet,   "TaskGGsheet",    20480, NULL, 3, NULL);
+
+  // xTaskCreate(TaskDHT20,   "DHT20",    4096, NULL, 3, NULL);
   // xTaskCreate(TaskBlink,"TaskBlink", 4096, NULL, 2, NULL);
   // xTaskCreate(TaskNeoPixel,"NeoPixel", 4096, NULL, 2, NULL);
   // xTaskCreate(TaskLCD,     "LCD",      4096, NULL, 1, NULL);

@@ -18,6 +18,7 @@
 #include <Preferences.h> 
 #include "HTTPUpdate.h"
 #include <TensorFlowLite_ESP32.h>
+#include <ESP_Google_Sheet_Client.h>
 
 ///
 #include "../src/connect/TaskWifi.h"
@@ -32,6 +33,7 @@
 #include "../src/system/StatusESP.h"
 #include "../src/system/LedStatus.h"
 #include "../src/device/TaskML.h"
+#include "../src/connect/TaskGGsheet.h"
 
 
 #include "tensorflow/lite/schema/schema_generated.h"
@@ -56,6 +58,8 @@ extern QueueHandle_t otaQueue;
 extern QueueHandle_t lcdQueue;
 extern QueueHandle_t coreIOTQueue;
 extern QueueHandle_t MLTinyQueue;
+extern QueueHandle_t GGSheetQueue;
+
 
 
 extern SemaphoreHandle_t mqttUpdateSem;
@@ -73,8 +77,8 @@ extern PubSubClient client;
 
 
 typedef struct{
-    int temp;
-    int humi;
+    float temp;
+    float humi;
 } Sensordata;
 
 typedef enum {

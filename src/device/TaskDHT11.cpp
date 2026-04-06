@@ -41,6 +41,7 @@ void TaskDHT11(void *pvParameters)
             xQueueOverwrite(lcdQueue, &data);
             xQueueOverwrite(coreIOTQueue, &data);
             xQueueOverwrite(MLTinyQueue, &data);
+            xQueueOverwrite(GGSheetQueue, &data);
 
         }
 

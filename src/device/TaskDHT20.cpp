@@ -60,6 +60,7 @@ void TaskDHT20(void *pvParameters)
             xQueueOverwrite(lcdQueue, &data);
             xQueueOverwrite(coreIOTQueue, &data);
             xQueueOverwrite(MLTinyQueue, &data);
+            xQueueOverwrite(GGSheetQueue, &data);
         }
 
         vTaskDelay(pdMS_TO_TICKS(3000)); 
