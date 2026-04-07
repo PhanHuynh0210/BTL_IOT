@@ -2,7 +2,7 @@
 
 Preferences mqttPrefs;
 const char* coreIOT_Server = "app.coreiot.io";  
-const char* coreIOT_Token = "gtf8cv81mqtv4zv799mj";   
+const char* coreIOT_Token = "V7owrjT8WmrHOt1tPS2f";   
 const int   mqttPort = 1883;
 
 char mqttToken[64];
