@@ -46,34 +46,61 @@ bool mqttReconnect()
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
+    Serial.println("\n========== CÓ TÍN HIỆU MQTT ĐẾN ==========");
+    Serial.print("[MQTT] Topic: ");
+    Serial.println(topic);
 
-  char message[length + 1];
-  memcpy(message, payload, length);
-  message[length] = '\0';
+    char message[length + 1];
+    memcpy(message, payload, length);
+    message[length] = '\0';
 
-  OTA_SYS ota;
+    Serial.print("[MQTT] Payload: ");
+    Serial.println(message);
+    Serial.println("=============================================\n");
 
-  // Parse JSON
-  StaticJsonDocument<256> doc;
-  DeserializationError error = deserializeJson(doc, message);
+    String topicStr = String(topic);
+    String reqId = "";
+    int reqIndex = topicStr.lastIndexOf('/');
+    if (reqIndex != -1) {
+        reqId = topicStr.substring(reqIndex + 1);
+    }
 
-  if (error) {
-    Serial.print("deserializeJson() failed: ");
-    Serial.println(error.c_str());
-    return;
-  }
+    OTA_SYS ota;
+
+    StaticJsonDocument<256> doc;
+    DeserializationError error = deserializeJson(doc, message);
+
+    if (error) {
+        Serial.print("deserializeJson() failed: ");
+        Serial.println(error.c_str());
+        return;
+    }
 
     if (doc.containsKey("method")) {
         const char* method = doc["method"];
 
         if (strcmp(method, "checkFirmware") == 0) {
-            ota = OTA_CHECK;
-            xQueueSend(otaQueue, &ota, 0);
+            String responseTopic = "v1/devices/me/rpc/response/" + reqId;
+            client.publish(responseTopic.c_str(), "{\"status\":\"app_is_checking_github\"}");
             return;
         }
+
         if (strcmp(method, "updateFirmware") == 0) {
-            ota = OTA_UPDATE;
-            xQueueSend(otaQueue, &ota, 0);
+            String responseTopic = "v1/devices/me/rpc/response/" + reqId;
+            client.publish(responseTopic.c_str(), "{\"status\":\"updating_started\"}");
+
+            if (doc["params"].containsKey("version")) {
+                const char* v = doc["params"]["version"];
+                VersionNew = String(v);
+                
+                Serial.print("[OTA] Nhận lệnh cài đặt phiên bản: ");
+                Serial.println(VersionNew);
+
+                ota = OTA_UPDATE;
+                xQueueSend(otaQueue, &ota, 0);
+            } else {
+                Serial.println("[OTA] Lỗi: App không gửi kèm thông tin version!");
+            }
             return;
         }
     }
@@ -81,13 +108,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if (doc.containsKey("updatemqtt")) {
         const char* token = doc["updatemqtt"];
         Serial.println(token);
-
         mqttPrefs.begin("mqtt", false);   
         mqttPrefs.putString("token", token);
         mqttPrefs.end();
         xSemaphoreGive(mqttUpdateSem);
     }
-
 }
 
 

@@ -1,10 +1,11 @@
 #include "TaskOTA.h"
 
-
 String VersionNew;
 
 #define OTA_BASE_URL "https://raw.githubusercontent.com/PhanHuynh0210/TTNT/gh-pages"
 #define OTA_BIN_NAME "firmware.bin"
+
+#define CURRENT_FIRMWARE_VERSION "v1.0" 
 
 void updateFirmwareVersion()
 {
@@ -20,12 +21,11 @@ void updateFirmwareVersion()
         return;
     }
 
-    String firmwareUrl =
-        String(OTA_BASE_URL) + "/" + VersionNew + "/" OTA_BIN_NAME;
+    String firmwareUrl = String(OTA_BASE_URL) + "/" + VersionNew + "/" + OTA_BIN_NAME;
 
     Serial.println("=== OTA UPDATE START ===");
-    Serial.println("Version: " + VersionNew);
-    Serial.println("URL: " + firmwareUrl);
+    Serial.println("Đang nâng cấp lên: " + VersionNew);
+    Serial.println("URL tải: " + firmwareUrl);
     Serial.println("========================");
 
     WiFiClientSecure otaClient;
@@ -46,124 +46,57 @@ void updateFirmwareVersion()
 
     t_httpUpdate_return ret = httpUpdate.update(otaClient, firmwareUrl);
 
-    // switch (ret)
-    // {
-    //     case HTTP_UPDATE_FAILED:
-    //         Serial.printf("[OTA] Failed: %s\n",
-    //             httpUpdate.getLastErrorString().c_str());
-    //         setStatus(STATUS_ERROR);
-    //         break;
+    switch (ret)
+    {
+        case HTTP_UPDATE_FAILED:
+            Serial.printf("[OTA] Failed: %s\n", httpUpdate.getLastErrorString().c_str());
+            break;
 
-    //     case HTTP_UPDATE_NO_UPDATES:
-    //         Serial.println("[OTA] No update");
-    //         setStatus(STATUS_NORMAL);
-    //         break;
+        case HTTP_UPDATE_NO_UPDATES:
+            Serial.println("[OTA] No update");
+            break;
 
-    //     case HTTP_UPDATE_OK:
-    //         Serial.println("[OTA] Update success – rebooting");
-    //         break;
-    // }
+        case HTTP_UPDATE_OK:
+            Serial.println("[OTA] Update success – rebooting");
+            break;
+    }
 }
 
-
-
-void checkFirmwareVersion()
+void reportCurrentFirmware()
 {
-    const char* githubApi =
-        "https://api.github.com/repos/PhanHuynh0210/TTNT/releases/latest";
+    StaticJsonDocument<128> mgs;
+    mgs["firmware_latest"] = CURRENT_FIRMWARE_VERSION;
 
-    if (WiFi.status() != WL_CONNECTED)
-    {
-        Serial.println("[OTA] WiFi not connected");
-        return;
+    char buffer[128];
+    size_t len = serializeJson(mgs, buffer);
+
+    if (client.publish("v1/devices/me/telemetry", buffer, len)) {
+        Serial.print("[OTA] Đã báo cáo phiên bản hiện hành lên Server: ");
+        Serial.println(CURRENT_FIRMWARE_VERSION);
     }
-
-    Serial.println("[OTA] Checking firmware version...");
-
-    WiFiClientSecure secureClient;
-    secureClient.setInsecure();  // CA
-
-    HTTPClient http;
-    if (!http.begin(secureClient, githubApi))
-    {
-        Serial.println("[OTA] HTTP begin failed");
-        return;
-    }
-
-    http.addHeader("User-Agent", "ESP32");
-
-    int httpCode = http.GET();
-    Serial.print("[OTA] HTTP code: ");
-    Serial.println(httpCode);
-
-    if (httpCode != HTTP_CODE_OK)
-    {
-        Serial.println("[OTA] GitHub API request failed");
-        http.end();
-        return;
-    }
-
-    String payload = http.getString();
-    http.end();
-
-    StaticJsonDocument<64> filter;
-    filter["tag_name"] = true;
-
-    StaticJsonDocument<256> doc;
-    DeserializationError error =
-        deserializeJson(doc, payload, DeserializationOption::Filter(filter));
-
-    if (error)
-    {
-        Serial.print("[OTA] JSON parse failed: ");
-        Serial.println(error.c_str());
-        return;
-    }
-
-    const char* latestVersion = doc["tag_name"];
-    VersionNew = latestVersion;
-    if (latestVersion == nullptr)
-    {
-        Serial.println("[OTA] tag_name not found");
-        return;
-    }
-
-
-    StaticJsonDocument<256> mgs;
-    mgs["firmware_latest"]  = latestVersion;
-
-    char buffer[256];
-    serializeJson(mgs, buffer);
-
-    client.publish("v1/devices/me/attributes", buffer);
-
-    Serial.println("[OTA] Firmware info published");
 }
-
 
 void ota_task(void *pvParameters)
-{
+{    
+    while (true) {
+        if (client.connected()) {
+            vTaskDelay(pdMS_TO_TICKS(1000)); 
+            reportCurrentFirmware();  
+            break;    
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000)); 
+    }
+
     OTA_SYS ota;
     for (;;)
     {
-        if (xQueueReceive(otaQueue,&ota, portMAX_DELAY))
+        if (xQueueReceive(otaQueue, &ota, portMAX_DELAY))
         {
-            switch (ota)
+            if (ota == OTA_UPDATE)
             {
-            case OTA_CHECK:
-                Serial.println("[OTA] Semaphore received");
-                checkFirmwareVersion();
-                break;
-
-            case OTA_UPDATE:
-                Serial.println("[OTA] Semaphore received");
+                Serial.println("[OTA] Nhận lệnh từ Queue, bắt đầu nạp Firmware...");
                 updateFirmwareVersion();
-                break;
-            
-            default:
-                break;
             }
-             
         }
     }
 }
