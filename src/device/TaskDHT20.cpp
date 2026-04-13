@@ -49,7 +49,7 @@ void TaskDHT20(void *pvParameters)
             if (data.humi < 30){
                 xSemaphoreGive(humLowSem);
             }
-            else if (data.humi < 35){
+            else if (data.humi < 70){
                 xSemaphoreGive(humMidSem);
             }
             else{

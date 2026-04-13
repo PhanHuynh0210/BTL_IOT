@@ -1,7 +1,7 @@
 #include "TaskLCD.h"
 // #define MY_SCL 11
 // #define MY_SDA 12
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+LiquidCrystal_I2C lcd(33, 16, 2);
 
 void TaskLCD(void *paParameters){
 

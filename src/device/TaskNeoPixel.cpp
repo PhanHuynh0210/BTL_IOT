@@ -1,31 +1,37 @@
-// #include "TaskNeoPixel.h"
+#include "TaskNeoPixel.h"
 
-// #define NEOPIXEL_PIN 45
-// #define NEOPIXEL_COUNT 1
-
-
-// Adafruit_NeoPixel statusNeoPixel(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+#define NEOPIXEL_PIN 8
+#define NEOPIXEL_COUNT 4
 
 
-// void TaskNeoPixel(void *pvParameters){
-//     statusNeoPixel.begin();
-//     statusNeoPixel.clear();
-//     statusNeoPixel.show();
+Adafruit_NeoPixel NeoPixel(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
-//     while (true) {
+void setAll(uint32_t color) {
+    for (int i = 0; i < NEOPIXEL_COUNT; i++) {
+        NeoPixel.setPixelColor(i, color);
+    }
+}
 
-//         if (xSemaphoreTake(humLowSem, 0)) {
-//             statusNeoPixel.setPixelColor(0, statusNeoPixel.Color(0, 0, 255));
-//         }
+void TaskNeoPixel(void *pvParameters){
+    NeoPixel.begin();
+    NeoPixel.clear();
+    NeoPixel.show();
 
-//         else if (xSemaphoreTake(humMidSem, 0)) {
-//             statusNeoPixel.setPixelColor(0, statusNeoPixel.Color(0, 255, 0)); 
-//         }
+    while (true) {
 
-//         else if (xSemaphoreTake(humHighSem, 0)) {
-//             statusNeoPixel.setPixelColor(0, statusNeoPixel.Color(255, 0, 0)); 
-//         }
+        if (xSemaphoreTake(humLowSem, 0)) {
+            setAll(NeoPixel.Color(0, 0, 255));   // xanh dương
+        }
 
-//         statusNeoPixel.show();
-//     }
-// }
+        else if (xSemaphoreTake(humMidSem, 0)) {
+            setAll(NeoPixel.Color(0, 255, 0));   // xanh lá
+        }
+
+        else if (xSemaphoreTake(humHighSem, 0)) {
+            setAll(NeoPixel.Color(255, 0, 0));   // đỏ
+        }
+
+        NeoPixel.show();
+        vTaskDelay(50 / portTICK_PERIOD_MS);
+    }
+}
