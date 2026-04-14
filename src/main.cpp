@@ -50,10 +50,11 @@ void setup()
   // xTaskCreate(TaskDHT11,   "TaskDHT11",    4096, NULL, 3, NULL);
   xTaskCreate(TaskGGsheet,   "TaskGGsheet",    20480, NULL, 3, NULL);
 
-  xTaskCreate(TaskDHT20,   "DHT20",    4096, NULL, 3, NULL);
+  // xTaskCreate(TaskDHT20,   "DHT20",    4096, NULL, 3, NULL);
   xTaskCreate(TaskBlink,"TaskBlink", 4096, NULL, 2, NULL);
   xTaskCreate(TaskNeoPixel,"NeoPixel", 4096, NULL, 2, NULL);
-  xTaskCreate(TaskLCD,     "LCD",      4096, NULL, 1, NULL);
+  // xTaskCreate(TaskLCD,     "LCD",      4096, NULL, 1, NULL);
+  xTaskCreate(TaskEspNowRecv,   "TaskEspNow",       4096, NULL, 4, NULL);
   // xTaskCreatePinnedToCore(TaskTinyML,"TinyML Task",10000,NULL,1, NULL,1);
 
 }

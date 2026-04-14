@@ -34,6 +34,8 @@
 #include "../src/system/LedStatus.h"
 #include "../src/device/TaskML.h"
 #include "../src/connect/TaskGGsheet.h"
+#include "../src/connect/TaskEspNow.h"
+
 
 
 #include "tensorflow/lite/schema/schema_generated.h"
@@ -71,7 +73,7 @@ extern QueueHandle_t wifiQueue;
 
 
 extern TimerHandle_t bootTimeoutTimer;
- 
+
 
 extern PubSubClient client;
 
@@ -100,7 +102,7 @@ typedef enum {
   EVT_WIFI_OK,
   EVT_WIFI_FAIL,
 
-  
+
   EVT_WIFI_SAVED,
   EVT_BOOT_TIMEOUT,
   EVT_BOOT_BUTTON_LONG,
@@ -114,5 +116,29 @@ typedef enum {
 #define MY_SCL 12
 #define MY_SDA 11
 
+// ==========================================
+// BỔ SUNG CẤU HÌNH ESP-NOW CHO MẠCH RECEIVER
+// ==========================================
+
+// Kênh WiFi để 2 mạch nói chuyện với nhau (Phải giống bên Sender)
+#ifndef ESPNOW_WIFI_CHANNEL
+#define ESPNOW_WIFI_CHANNEL 1
+#endif
+
+// Địa chỉ MAC của mạch Receiver này (dành cho Sender biết để gửi tới)
+#ifndef ESPNOW_PEER_MAC 
+#define ESPNOW_PEER_MAC {0x98, 0xA3, 0x16, 0xC0, 0x1A, 0x48}
+#endif
+
+// Cấu trúc gói tin nhận từ Sender
+typedef struct __attribute__((packed)) {
+  uint32_t magic;      // Magic Number chống nhiễu (0xB71E10F0)
+  uint8_t  sensorId;   // ID của cảm biến
+  float    temp;       // Nhiệt độ
+  float    humi;       // Độ ẩm
+  uint32_t uptimeMs;   // Thời gian hoạt động
+} EspNowDht20Packet;
+
+// ==========================================
 
 #endif
