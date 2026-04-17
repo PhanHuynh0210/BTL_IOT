@@ -53,13 +53,25 @@ void TaskEspNowRecv(void *pvParameters) {
       Serial.println("====================================\n");
 
       Sensordata sData;
-      sData.temp = rxData.temp;
-      sData.humi = rxData.humi;
+      sData.sensorId = rxData.sensorId;
+      sData.temp     = rxData.temp;
+      sData.humi     = rxData.humi;
+      sData.uptimeMs = rxData.uptimeMs;
 
-      xQueueOverwrite(lcdQueue, &sData); 
-      xQueueOverwrite(GGSheetQueue, &sData);
-      xQueueOverwrite(coreIOTQueue, &sData);
-      xQueueOverwrite(MLTinyQueue, &sData);
+      // LCD chỉ cần bản mới nhất -> Overwrite (queue size = 1)
+      xQueueOverwrite(lcdQueue, &sData);
+
+      // Các consumer còn lại cần đầy đủ dữ liệu theo từng sensor -> Send (không Overwrite).
+      // Nếu queue đầy sẽ bỏ gói này, nhưng không làm mất gói của sensor khác đã có sẵn trong queue.
+      if (xQueueSend(coreIOTQueue, &sData, 0) != pdTRUE) {
+        Serial.printf("[ESPNOW] coreIOTQueue full, drop sensor %u\n", rxData.sensorId);
+      }
+      if (xQueueSend(GGSheetQueue, &sData, 0) != pdTRUE) {
+        Serial.printf("[ESPNOW] GGSheetQueue full, drop sensor %u\n", rxData.sensorId);
+      }
+      if (xQueueSend(MLTinyQueue, &sData, 0) != pdTRUE) {
+        Serial.printf("[ESPNOW] MLTinyQueue full, drop sensor %u\n", rxData.sensorId);
+      }
     }
   }
 }

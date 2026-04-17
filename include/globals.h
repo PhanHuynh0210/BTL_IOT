@@ -78,10 +78,22 @@ extern TimerHandle_t bootTimeoutTimer;
 extern PubSubClient client;
 
 
+#define MAX_SENSORS 8
+
 typedef struct{
-    float temp;
-    float humi;
+    uint8_t  sensorId;   // 1..MAX_SENSORS (0 = unknown / local)
+    float    temp;
+    float    humi;
+    uint32_t uptimeMs;
 } Sensordata;
+
+// Tên device hiển thị trên CoreIoT gateway và trong log.
+// sensorId = 1 -> "dht20-sensor-1", v.v.
+inline const char* sensorName(uint8_t id) {
+    static char buf[24];
+    snprintf(buf, sizeof(buf), "dht20-sensor-%u", (unsigned)id);
+    return buf;
+}
 
 typedef enum {
   STATUS_BOOTING,

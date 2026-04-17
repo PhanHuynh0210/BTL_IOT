@@ -175,21 +175,56 @@ void coreiot_task(void *pvParameters){
                 xSemaphoreTake(CoreIOTSem, portMAX_DELAY);
             }
 
+            if (!client.connected()) {
+                // Sẽ thử reconnect ở vòng lặp kế tiếp.
+                continue;
+            }
 
-            StaticJsonDocument<128> doc;
-            doc["temperature"] = data.temp;
-            doc["humidity"]    = data.humi;
+            // sensorId = 0 hoặc > MAX_SENSORS: coi là local/unknown, publish theo API single-device.
+            if (data.sensorId == 0 || data.sensorId > MAX_SENSORS) {
+                StaticJsonDocument<128> doc;
+                doc["temperature"] = data.temp;
+                doc["humidity"]    = data.humi;
 
-            char buffer[128];
-            size_t len = serializeJson(doc, buffer);
+                char buffer[128];
+                size_t len = serializeJson(doc, buffer);
+                client.publish("v1/devices/me/telemetry", buffer, len);
+            } else {
+                // Gateway mode: mỗi sensorId là 1 device con trên CoreIoT.
+                // Cache trạng thái "đã connect" để chỉ gửi v1/gateway/connect 1 lần/device.
+                static bool connectedSensor[MAX_SENSORS + 1] = {false};
 
-            client.publish("v1/devices/me/telemetry",buffer,len);
+                const char* devName = sensorName(data.sensorId);
 
+                if (!connectedSensor[data.sensorId]) {
+                    StaticJsonDocument<64> c;
+                    c["device"] = devName;
+                    char cbuf[96];
+                    size_t cn = serializeJson(c, cbuf);
+                    if (client.publish("v1/gateway/connect", cbuf, cn)) {
+                        connectedSensor[data.sensorId] = true;
+                        Serial.printf("[GW] connect %s\n", devName);
+                    } else {
+                        Serial.printf("[GW] connect %s FAIL\n", devName);
+                    }
+                }
 
+                // Payload: { "<devName>": [ { "values": { "temperature": .., "humidity": .. } } ] }
+                StaticJsonDocument<192> doc;
+                JsonArray arr = doc.createNestedArray(devName);
+                JsonObject item = arr.createNestedObject();
+                JsonObject values = item.createNestedObject("values");
+                values["temperature"] = data.temp;
+                values["humidity"]    = data.humi;
 
-            // Serial.print("[CoreIOT] Published: ");
-            // Serial.println(buffer);
-            
+                char buffer[192];
+                size_t len = serializeJson(doc, buffer);
+                if (!client.publish("v1/gateway/telemetry", buffer, len)) {
+                    Serial.printf("[GW] telemetry %s FAIL\n", devName);
+                    // Nếu publish fail, reset trạng thái để lần sau connect lại.
+                    connectedSensor[data.sensorId] = false;
+                }
+            }
         }
     }
 

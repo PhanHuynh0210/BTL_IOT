@@ -114,9 +114,10 @@ void TaskGGsheet(void *pvParameters)
         {
             headerRow.add("majorDimension", "ROWS");
             headerRow.set("values/[0]/[0]", "Timestamp");
-            headerRow.set("values/[0]/[1]", "Temperature");
-            headerRow.set("values/[0]/[2]", "Humidity");
-            if (GSheet.values.append(&headerResp, spreadsheetId, "Sheet1!A:C", &headerRow))
+            headerRow.set("values/[0]/[1]", "SensorID");
+            headerRow.set("values/[0]/[2]", "Temperature");
+            headerRow.set("values/[0]/[3]", "Humidity");
+            if (GSheet.values.append(&headerResp, spreadsheetId, "Sheet1!A1:D1", &headerRow))
             {
                 Serial.println("Header OK");
                 headerDone = true;
@@ -139,8 +140,9 @@ void TaskGGsheet(void *pvParameters)
 
         String timestamp = formatTimestamp(epochTime);
 
-        Serial.printf("Upload NOW: %s | T=%.2f | H=%.2f\n",
+        Serial.printf("Upload NOW: %s | ID=%u | T=%.2f | H=%.2f\n",
                       timestamp.c_str(),
+                      (unsigned)pendingData.sensorId,
                       (double)pendingData.temp,
                       (double)pendingData.humi);
 
@@ -149,10 +151,11 @@ void TaskGGsheet(void *pvParameters)
         response.clear();
         valueRange.add("majorDimension", "ROWS");
         valueRange.set("values/[0]/[0]", timestamp);
-        valueRange.set("values/[0]/[1]", pendingData.temp);
-        valueRange.set("values/[0]/[2]", pendingData.humi);
+        valueRange.set("values/[0]/[1]", (int)pendingData.sensorId);
+        valueRange.set("values/[0]/[2]", pendingData.temp);
+        valueRange.set("values/[0]/[3]", pendingData.humi);
 
-        if (GSheet.values.append(&response, spreadsheetId, "Sheet1!A:C", &valueRange))
+        if (GSheet.values.append(&response, spreadsheetId, "Sheet1!A1", &valueRange))
         {
             Serial.println("Upload OK");
             hasPending = false; 

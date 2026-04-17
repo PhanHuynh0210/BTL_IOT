@@ -19,10 +19,12 @@ void setup()
   mqttUpdateSem = xSemaphoreCreateBinary();
 
   //data
-  lcdQueue = xQueueCreate(1, sizeof(Sensordata));
-  coreIOTQueue = xQueueCreate(1, sizeof(Sensordata));
-  MLTinyQueue = xQueueCreate(1, sizeof(Sensordata));
-  GGSheetQueue = xQueueCreate(1, sizeof(Sensordata));
+  // LCD chỉ cần bản mới nhất -> giữ size 1 + Overwrite ở TaskEspNow.
+  lcdQueue     = xQueueCreate(1,                    sizeof(Sensordata));
+  // Các consumer khác cần đầy đủ dữ liệu từng sensor -> dung lượng tỷ lệ theo MAX_SENSORS.
+  coreIOTQueue = xQueueCreate(MAX_SENSORS * 4,      sizeof(Sensordata));
+  MLTinyQueue  = xQueueCreate(MAX_SENSORS * 4,      sizeof(Sensordata));
+  GGSheetQueue = xQueueCreate(MAX_SENSORS * 4,      sizeof(Sensordata));
 
 
   stateQueue = xQueueCreate(10, sizeof(system_event));
