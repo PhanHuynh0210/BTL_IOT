@@ -209,13 +209,20 @@ void coreiot_task(void *pvParameters){
                     }
                 }
 
-                // Payload: { "<devName>": [ { "values": { "temperature": .., "humidity": .. } } ] }
+                // Payload format phẳng cho CoreIoT Gateway:
+                // { "<devName>": [ { "ts": <ms>, "temperature": .., "humidity": .. } ] }
+                // CoreIoT không unwrap "values" nên phải đặt key ngang hàng với "ts".
                 StaticJsonDocument<192> doc;
                 JsonArray arr = doc.createNestedArray(devName);
                 JsonObject item = arr.createNestedObject();
-                JsonObject values = item.createNestedObject("values");
-                values["temperature"] = data.temp;
-                values["humidity"]    = data.humi;
+
+                // Lấy epoch ms nếu đã sync NTP (TaskGGsheet gọi configTime).
+                time_t now = time(nullptr);
+                if (now > 1700000000) { // ~2023-11, coi như đã có time hợp lệ
+                    item["ts"] = (uint64_t)now * 1000ULL;
+                }
+                item["temperature"] = data.temp;
+                item["humidity"]    = data.humi;
 
                 char buffer[192];
                 size_t len = serializeJson(doc, buffer);
@@ -223,6 +230,8 @@ void coreiot_task(void *pvParameters){
                     Serial.printf("[GW] telemetry %s FAIL\n", devName);
                     // Nếu publish fail, reset trạng thái để lần sau connect lại.
                     connectedSensor[data.sensorId] = false;
+                } else {
+                    Serial.printf("[GW] telemetry %s OK: %s\n", devName, buffer);
                 }
             }
         }
